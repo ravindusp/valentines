@@ -5,6 +5,7 @@ import { Candidate, VotingPower } from '../types';
 
 interface GalleryProps {
   onNavigateToProfile: (id: string) => void;
+  onNavigateToLeaderboard: () => void;
   onCastVote: (id: string) => Promise<void>;
   activeVoteCandidateId?: string | null;
   votingPower: VotingPower;
@@ -13,6 +14,7 @@ interface GalleryProps {
 
 const Gallery: React.FC<GalleryProps> = ({
   onNavigateToProfile,
+  onNavigateToLeaderboard,
   onCastVote,
   activeVoteCandidateId,
   votingPower,
@@ -90,7 +92,12 @@ const Gallery: React.FC<GalleryProps> = ({
                 The voting is officially open! Support the most inspiring members of our community. Every vote counts towards the crown.
               </p>
               <div className="flex gap-4">
-                <button className="bg-white text-primary px-8 py-3 rounded-full font-bold shadow-xl shadow-black/10 hover:bg-pink-50 transition-colors">View Leaderboard</button>
+                <button
+                  onClick={onNavigateToLeaderboard}
+                  className="bg-white text-primary px-8 py-3 rounded-full font-bold shadow-xl shadow-black/10 hover:bg-pink-50 transition-colors"
+                >
+                  View Leaderboard
+                </button>
                 <button className="bg-transparent border border-white/40 px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors">Voting Rules</button>
               </div>
             </div>

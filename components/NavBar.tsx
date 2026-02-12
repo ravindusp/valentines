@@ -9,6 +9,7 @@ const NavBar: React.FC = () => {
   const router = useRouter();
   const isHome = pathname === '/';
   const isCandidates = pathname === '/candidates' || pathname?.startsWith('/candidate/');
+  const isLeaderboard = pathname === '/leaderboard';
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-primary/10">
@@ -39,7 +40,12 @@ const NavBar: React.FC = () => {
           >
             Candidates
           </Link>
-          <button className="hover:text-primary transition-colors">Leaderboard</button>
+          <Link
+            href="/leaderboard"
+            className={isLeaderboard ? 'text-primary' : 'hover:text-primary transition-colors'}
+          >
+            Leaderboard
+          </Link>
           <button className="hover:text-primary transition-colors">Rules</button>
         </div>
 

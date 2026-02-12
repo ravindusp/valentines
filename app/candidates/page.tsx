@@ -74,6 +74,10 @@ export default function CandidatesPage() {
           router.push(`/candidate/${id}`);
           window.scrollTo(0, 0);
         }}
+        onNavigateToLeaderboard={() => {
+          router.push('/leaderboard');
+          window.scrollTo(0, 0);
+        }}
         onCastVote={onCastVote}
         activeVoteCandidateId={activeVoteCandidateId}
         votingPower={votingPower}
