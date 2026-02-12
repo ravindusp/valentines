@@ -1,12 +1,21 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Candidate } from '../types';
 
 interface GalleryProps {
   onNavigateToProfile: (id: string) => void;
+  onCastVote: (id: string) => Promise<void>;
+  activeVoteCandidateId?: string | null;
   candidates: Candidate[];
 }
 
-const Gallery: React.FC<GalleryProps> = ({ onNavigateToProfile, candidates }) => {
+const Gallery: React.FC<GalleryProps> = ({
+  onNavigateToProfile,
+  onCastVote,
+  activeVoteCandidateId,
+  candidates,
+}) => {
   const [filter, setFilter] = useState('All');
 
   return (
@@ -145,14 +154,27 @@ const Gallery: React.FC<GalleryProps> = ({ onNavigateToProfile, candidates }) =>
                   </div>
                   
                   <p className="text-sm text-slate-600 line-clamp-2 mb-6 leading-relaxed">
-                    {candidate.hasVoted ? 'You voted for ' + candidate.name.split(' ')[0] + ' on Feb 12th.' : candidate.description}
+                    {candidate.hasVoted && candidate.hasVotedAt
+                      ? `You voted for ${candidate.name.split(' ')[0]} on ${new Date(candidate.hasVotedAt).toLocaleDateString()}.`
+                      : candidate.description}
                   </p>
 
-                  <button 
-                    disabled={!!candidate.hasVoted}
+                  <button
+                    onClick={async (event) => {
+                      event.stopPropagation();
+                      if (candidate.hasVoted) {
+                        return;
+                      }
+                      await onCastVote(candidate.id);
+                    }}
+                    disabled={!!candidate.hasVoted || activeVoteCandidateId === candidate.id}
                     className={`mt-auto w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${candidate.hasVoted ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 active:scale-95'}`}
                   >
-                     {candidate.hasVoted ? 'Vote Cast' : <><span className="material-icons text-sm">favorite</span> Cast Vote</>}
+                     {candidate.hasVoted
+                       ? 'Vote Cast'
+                       : activeVoteCandidateId === candidate.id
+                        ? 'Casting...'
+                        : <><span className="material-icons text-sm">favorite</span> Cast Vote</>}
                   </button>
                 </div>
               </div>

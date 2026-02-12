@@ -1,20 +1,59 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Valentine's Queen (Next.js 16 + Supabase)
 
-# Run and deploy your AI Studio app
+This project has been migrated from Vite to **Next.js 16 (App Router)** and now uses **Supabase** as the backend for candidates and vote casting.
 
-This contains everything you need to run your app locally.
+## Stack
 
-View your app in AI Studio: https://ai.studio/apps/drive/1YcydJFj3GBu8qjy6bl8cTAZLNhK7Zak9
+- Next.js 16
+- React 19
+- Supabase Postgres
+- Next API routes for backend access from the UI
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
+## Local Run
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```bash
+   npm install
+   ```
+2. Copy env file and set values:
+   ```bash
+   cp .env.example .env.local
+   ```
+3. Run development server:
+   ```bash
+   npm run dev
+   ```
+
+## Required Environment Variables
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `VOTE_HASH_SALT`
+
+## Supabase Setup
+
+1. Create a Supabase project.
+2. Run SQL migration from:
+   - `supabase/migrations/20260212120000_init_voting.sql`
+3. Confirm tables/functions exist:
+   - `public.candidates`
+   - `public.votes`
+   - `public.cast_vote(...)`
+
+## Vote Abuse Protection
+
+Vote casting is server-side and enforced in SQL (`cast_vote`) using hashed identifiers:
+
+- `device_hash` (derived from browser device ID)
+- `ip_hash` (derived from request IP)
+- `ua_hash` (derived from user-agent)
+
+Current protections:
+
+- 10-second cooldown between votes per device
+- Max 10 votes per device per 24 hours
+- Max 40 votes per IP per 24 hours
+- No repeat vote for same candidate from same device within 24 hours
+
+Note: browser apps cannot reliably read a real MAC address. Device + IP + server-side rate limits are used instead.

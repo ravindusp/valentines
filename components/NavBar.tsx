@@ -1,15 +1,21 @@
+'use client';
+
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 
 const NavBar: React.FC = () => {
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
+  const isHome = pathname === '/';
+  const isCandidates = pathname === '/candidates' || pathname?.startsWith('/candidate/');
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-primary/10">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
         <button
           onClick={() => {
-            navigate('/');
+            router.push('/');
             window.scrollTo(0, 0);
           }}
           className="flex items-center gap-2"
@@ -21,22 +27,18 @@ const NavBar: React.FC = () => {
         </button>
 
         <div className="hidden md:flex items-center gap-8 font-medium">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              isActive ? 'text-primary' : 'hover:text-primary transition-colors'
-            }
+          <Link
+            href="/"
+            className={isHome ? 'text-primary' : 'hover:text-primary transition-colors'}
           >
             Home
-          </NavLink>
-          <NavLink
-            to="/candidates"
-            className={({ isActive }) =>
-              isActive ? 'text-primary' : 'hover:text-primary transition-colors'
-            }
+          </Link>
+          <Link
+            href="/candidates"
+            className={isCandidates ? 'text-primary' : 'hover:text-primary transition-colors'}
           >
             Candidates
-          </NavLink>
+          </Link>
           <button className="hover:text-primary transition-colors">Leaderboard</button>
           <button className="hover:text-primary transition-colors">Rules</button>
         </div>
@@ -47,7 +49,7 @@ const NavBar: React.FC = () => {
           </button>
           <button
             onClick={() => {
-              navigate('/candidates');
+              router.push('/candidates');
               window.scrollTo(0, 0);
             }}
             className="px-6 py-2.5 rounded-full bg-primary text-white font-bold hover:shadow-lg hover:shadow-primary/30 transition-all transform hover:scale-105"

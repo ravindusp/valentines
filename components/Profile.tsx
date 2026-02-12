@@ -1,11 +1,15 @@
+'use client';
+
 import React from 'react';
 import { Candidate } from '../types';
 
 interface ProfileProps {
   candidate: Candidate;
+  onCastVote: (id: string) => Promise<void>;
+  isVoting?: boolean;
 }
 
-const Profile: React.FC<ProfileProps> = ({ candidate }) => {
+const Profile: React.FC<ProfileProps> = ({ candidate, onCastVote, isVoting }) => {
   return (
     <div className="bg-bg-light min-h-screen font-sans">
       <main className="max-w-7xl mx-auto px-6 py-8">
@@ -40,8 +44,16 @@ const Profile: React.FC<ProfileProps> = ({ candidate }) => {
               <button className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-white/20 transition-all">
                 <span className="material-icons">share</span> Share
               </button>
-              <button className="bg-primary text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:scale-105 transition-all shadow-xl shadow-primary/40">
-                <span className="material-icons">favorite</span> Cast Vote
+              <button
+                onClick={() => onCastVote(candidate.id)}
+                disabled={!!candidate.hasVoted || isVoting}
+                className={`px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-xl shadow-primary/40 ${
+                  candidate.hasVoted || isVoting
+                    ? 'bg-slate-300 text-slate-600 cursor-not-allowed'
+                    : 'bg-primary text-white hover:scale-105'
+                }`}
+              >
+                <span className="material-icons">favorite</span> {candidate.hasVoted ? 'Vote Cast' : isVoting ? 'Casting...' : 'Cast Vote'}
               </button>
             </div>
           </div>

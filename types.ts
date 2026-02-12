@@ -8,17 +8,14 @@ export interface Candidate {
   description: string;
   isTrending?: boolean;
   hasVoted?: boolean;
+  hasVotedAt?: string | null;
   rank?: number;
 }
 
-export type ViewState = 'HOME' | 'GALLERY' | 'PROFILE';
-
-export interface Comment {
-  id: string;
-  author: string;
-  avatar: string;
-  content: string;
-  timeAgo: string;
-  likes: number;
-  replies: Comment[];
+export interface VoteResponse {
+  ok: boolean;
+  message: string;
+  votes?: number;
+  hasVoted?: boolean;
+  hasVotedAt?: string | null;
 }
