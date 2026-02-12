@@ -30,16 +30,31 @@ This project has been migrated from Vite to **Next.js 16 (App Router)** and now 
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `VOTE_HASH_SALT`
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
+- `ADMIN_SESSION_SECRET`
 
 ## Supabase Setup
 
 1. Create a Supabase project.
 2. Run SQL migration from:
    - `supabase/migrations/20260212120000_init_voting.sql`
+   - `supabase/migrations/20260212145000_fix_cast_vote_vote_count_ambiguity.sql`
+   - `supabase/migrations/20260212170000_add_admin_candidate_storage.sql`
 3. Confirm tables/functions exist:
    - `public.candidates`
    - `public.votes`
    - `public.cast_vote(...)`
+   - `storage bucket: candidate-images`
+
+## Admin Management
+
+- Open `/admin` and log in with `ADMIN_USERNAME` + `ADMIN_PASSWORD`.
+- The admin page supports:
+  - contender creation
+  - image upload to Supabase Storage (`candidate-images`)
+  - contender deletion
+- Public candidates pages now read only from Supabase and do not use runtime mock fallback data.
 
 ## Vote Abuse Protection
 

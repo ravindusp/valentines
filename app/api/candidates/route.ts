@@ -1,23 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { mapCandidateRow } from '@/lib/candidate-mapper';
-import { CANDIDATES_SEED } from '@/lib/candidates-seed';
 import { createStableHash, getVoteSalt } from '@/lib/security';
 import { hasSupabaseAdmin, supabaseAdmin } from '@/lib/supabase/admin';
-
-const mapFallbackCandidate = (candidate: (typeof CANDIDATES_SEED)[number]) => ({
-  id: candidate.id,
-  name: candidate.name,
-  image: candidate.image,
-  department: candidate.department,
-  role: candidate.role,
-  description: candidate.description,
-  votes: candidate.vote_count,
-  isTrending: !!candidate.is_trending,
-  rank: candidate.rank || undefined,
-  hasVoted: false,
-  hasVotedAt: null,
-});
 
 export async function GET(request: NextRequest) {
   const limitParam = request.nextUrl.searchParams.get('limit');
@@ -25,11 +10,13 @@ export async function GET(request: NextRequest) {
   const limit = Number.isFinite(parsedLimit) && parsedLimit ? Math.max(1, parsedLimit) : undefined;
 
   if (!hasSupabaseAdmin || !supabaseAdmin) {
-    const data = (limit ? CANDIDATES_SEED.slice(0, limit) : CANDIDATES_SEED).map(mapFallbackCandidate);
-    return NextResponse.json({
-      candidates: data,
-      warning: 'Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
-    });
+    return NextResponse.json(
+      {
+        message:
+          'Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      },
+      { status: 503 }
+    );
   }
 
   const salt = getVoteSalt();

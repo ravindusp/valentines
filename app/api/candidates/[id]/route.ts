@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { mapCandidateRow } from '@/lib/candidate-mapper';
-import { CANDIDATES_SEED } from '@/lib/candidates-seed';
 import { createStableHash, getVoteSalt } from '@/lib/security';
 import { hasSupabaseAdmin, supabaseAdmin } from '@/lib/supabase/admin';
 
@@ -12,28 +11,13 @@ export async function GET(
   const { id } = await context.params;
 
   if (!hasSupabaseAdmin || !supabaseAdmin) {
-    const fallback = CANDIDATES_SEED.find((candidate) => candidate.id === id);
-
-    if (!fallback) {
-      return NextResponse.json({ message: 'Candidate not found' }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      candidate: {
-        id: fallback.id,
-        name: fallback.name,
-        image: fallback.image,
-        department: fallback.department,
-        role: fallback.role,
-        description: fallback.description,
-        votes: fallback.vote_count,
-        isTrending: !!fallback.is_trending,
-        rank: fallback.rank || undefined,
-        hasVoted: false,
-        hasVotedAt: null,
+    return NextResponse.json(
+      {
+        message:
+          'Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
       },
-      warning: 'Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
-    });
+      { status: 503 }
+    );
   }
 
   const { data: candidate, error } = await supabaseAdmin

@@ -44,7 +44,13 @@ const NavBar: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <button className="px-6 py-2.5 rounded-full border-2 border-primary/20 text-primary font-bold hover:bg-primary/5 transition-all">
+          <button
+            onClick={() => {
+              router.push('/admin');
+              window.scrollTo(0, 0);
+            }}
+            className="px-6 py-2.5 rounded-full border-2 border-primary/20 text-primary font-bold hover:bg-primary/5 transition-all"
+          >
             Login
           </button>
           <button

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 
 import Profile from '@/components/Profile';
+import Toast from '@/components/Toast';
 import { castVoteForCandidate, fetchCandidateById } from '@/lib/client/api';
 import { Candidate } from '@/types';
 
@@ -17,6 +18,7 @@ export default function CandidateProfilePage() {
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [isVoting, setIsVoting] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [feedbackType, setFeedbackType] = useState<'success' | 'error' | 'info'>('info');
 
   const loadCandidate = async (id: string) => {
     const item = await fetchCandidateById(id);
@@ -29,17 +31,34 @@ export default function CandidateProfilePage() {
     }
 
     loadCandidate(candidateId).catch((error) => {
+      setFeedbackType('error');
       setFeedbackMessage(error instanceof Error ? error.message : 'Failed to load candidate.');
     });
   }, [candidateId]);
+
+  useEffect(() => {
+    if (!feedbackMessage) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setFeedbackMessage('');
+    }, 4500);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [feedbackMessage]);
 
   const onCastVote = async (id: string) => {
     try {
       setIsVoting(true);
       const response = await castVoteForCandidate(id);
+      setFeedbackType('success');
       setFeedbackMessage(response.message);
       await loadCandidate(id);
     } catch (error) {
+      setFeedbackType('error');
       setFeedbackMessage(error instanceof Error ? error.message : 'Vote failed.');
     } finally {
       setIsVoting(false);
@@ -60,13 +79,11 @@ export default function CandidateProfilePage() {
 
   return (
     <>
-      {feedbackMessage && (
-        <div className="max-w-7xl mx-auto mt-4 px-6">
-          <div className="rounded-xl border border-primary/20 bg-white px-4 py-3 text-sm text-slate-700">
-            {feedbackMessage}
-          </div>
-        </div>
-      )}
+      <Toast
+        message={feedbackMessage}
+        type={feedbackType}
+        onClose={() => setFeedbackMessage('')}
+      />
       <Profile candidate={candidate} onCastVote={onCastVote} isVoting={isVoting} />
     </>
   );

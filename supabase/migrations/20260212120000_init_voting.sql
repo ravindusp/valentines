@@ -138,7 +138,10 @@ begin
       and device_hash = p_device_hash
       and created_at >= v_now - interval '24 hours'
   ) then
-    select vote_count into v_vote_count from public.candidates where id = p_candidate_id;
+    select c.vote_count
+    into v_vote_count
+    from public.candidates as c
+    where c.id = p_candidate_id;
     return query select 'already_voted', 'You already voted for this candidate in the last 24 hours.', coalesce(v_vote_count, 0), v_now;
     return;
   end if;
@@ -146,11 +149,11 @@ begin
   insert into public.votes (candidate_id, device_hash, ip_hash, ua_hash, created_at)
   values (p_candidate_id, p_device_hash, p_ip_hash, p_ua_hash, v_now);
 
-  update public.candidates
-  set vote_count = vote_count + 1,
+  update public.candidates as c
+  set vote_count = c.vote_count + 1,
       updated_at = now()
-  where id = p_candidate_id
-  returning candidates.vote_count into v_vote_count;
+  where c.id = p_candidate_id
+  returning c.vote_count into v_vote_count;
 
   return query select 'ok', 'Vote recorded successfully.', v_vote_count, v_now;
 end;
