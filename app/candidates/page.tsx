@@ -6,18 +6,24 @@ import { useRouter } from 'next/navigation';
 import Gallery from '@/components/Gallery';
 import Toast from '@/components/Toast';
 import { castVoteForCandidate, fetchCandidates } from '@/lib/client/api';
-import { Candidate } from '@/types';
+import { Candidate, VotingPower } from '@/types';
 
 export default function CandidatesPage() {
   const router = useRouter();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [votingPower, setVotingPower] = useState<VotingPower>({
+    dailyLimit: 2,
+    used: 0,
+    remaining: 2,
+  });
   const [activeVoteCandidateId, setActiveVoteCandidateId] = useState<string | null>(null);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [feedbackType, setFeedbackType] = useState<'success' | 'error' | 'info'>('info');
 
   const loadCandidates = async () => {
-    const items = await fetchCandidates();
-    setCandidates(items);
+    const payload = await fetchCandidates();
+    setCandidates(payload.candidates);
+    setVotingPower(payload.votingPower);
   };
 
   useEffect(() => {
@@ -70,6 +76,7 @@ export default function CandidatesPage() {
         }}
         onCastVote={onCastVote}
         activeVoteCandidateId={activeVoteCandidateId}
+        votingPower={votingPower}
         candidates={candidates}
       />
     </>

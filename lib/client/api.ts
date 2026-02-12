@@ -1,9 +1,5 @@
-import { Candidate, VoteResponse } from '@/types';
+import { Candidate, CandidatesResponse, VoteResponse } from '@/types';
 import { getDeviceId } from '@/lib/client/device-id';
-
-interface CandidatesPayload {
-  candidates: Candidate[];
-}
 
 interface CandidatePayload {
   candidate: Candidate;
@@ -30,8 +26,7 @@ const apiRequest = async <T>(path: string, init?: RequestInit): Promise<T> => {
 
 export const fetchCandidates = async (limit?: number) => {
   const query = typeof limit === 'number' ? `?limit=${limit}` : '';
-  const payload = await apiRequest<CandidatesPayload>(`/api/candidates${query}`);
-  return payload.candidates;
+  return apiRequest<CandidatesResponse>(`/api/candidates${query}`);
 };
 
 export const fetchCandidateById = async (id: string) => {

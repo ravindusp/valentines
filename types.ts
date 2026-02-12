@@ -12,9 +12,21 @@ export interface Candidate {
   rank?: number;
 }
 
+export interface VotingPower {
+  dailyLimit: number;
+  used: number;
+  remaining: number;
+}
+
+export interface CandidatesResponse {
+  candidates: Candidate[];
+  votingPower: VotingPower;
+}
+
 export interface VoteResponse {
   ok: boolean;
   message: string;
+  status?: string;
   votes?: number;
   hasVoted?: boolean;
   hasVotedAt?: string | null;

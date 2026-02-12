@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Candidate } from '../types';
+import { Candidate, VotingPower } from '../types';
 
 interface GalleryProps {
   onNavigateToProfile: (id: string) => void;
   onCastVote: (id: string) => Promise<void>;
   activeVoteCandidateId?: string | null;
+  votingPower: VotingPower;
   candidates: Candidate[];
 }
 
@@ -14,9 +15,12 @@ const Gallery: React.FC<GalleryProps> = ({
   onNavigateToProfile,
   onCastVote,
   activeVoteCandidateId,
+  votingPower,
   candidates,
 }) => {
   const [filter, setFilter] = useState('All');
+  const creditsRatio = votingPower.dailyLimit > 0 ? votingPower.remaining / votingPower.dailyLimit : 0;
+  const creditProgressWidth = `${Math.max(0, Math.min(100, creditsRatio * 100))}%`;
 
   return (
     <div className="bg-bg-light min-h-screen font-sans flex flex-col">
@@ -61,14 +65,16 @@ const Gallery: React.FC<GalleryProps> = ({
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-500">Voting Power</p>
-                <p className="text-lg font-black text-slate-900">3 Credits Left</p>
+                <p className="text-lg font-black text-slate-900">{votingPower.remaining} Credits Left</p>
               </div>
             </div>
             <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-              <div className="bg-primary h-full w-[60%]"></div>
+              <div className="bg-primary h-full" style={{ width: creditProgressWidth }}></div>
             </div>
             <p className="text-[10px] text-slate-500 mt-3 leading-tight italic">
-              Credits reset daily. Vote for your favorite queens to increase their rank!
+              {votingPower.remaining > 0
+                ? `Credits reset daily. You have used ${votingPower.used} of ${votingPower.dailyLimit} votes today.`
+                : `You have used all ${votingPower.dailyLimit} daily votes. Credits reset every 24 hours.`}
             </p>
           </div>
         </aside>
@@ -162,16 +168,26 @@ const Gallery: React.FC<GalleryProps> = ({
                   <button
                     onClick={async (event) => {
                       event.stopPropagation();
-                      if (candidate.hasVoted) {
+                      if (candidate.hasVoted || votingPower.remaining <= 0) {
                         return;
                       }
                       await onCastVote(candidate.id);
                     }}
-                    disabled={!!candidate.hasVoted || activeVoteCandidateId === candidate.id}
-                    className={`mt-auto w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${candidate.hasVoted ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 active:scale-95'}`}
+                    disabled={
+                      !!candidate.hasVoted ||
+                      votingPower.remaining <= 0 ||
+                      activeVoteCandidateId === candidate.id
+                    }
+                    className={`mt-auto w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+                      candidate.hasVoted || votingPower.remaining <= 0
+                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                        : 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 active:scale-95'
+                    }`}
                   >
                      {candidate.hasVoted
                        ? 'Vote Cast'
+                       : votingPower.remaining <= 0
+                        ? 'No Credits Left'
                        : activeVoteCandidateId === candidate.id
                         ? 'Casting...'
                         : <><span className="material-icons text-sm">favorite</span> Cast Vote</>}

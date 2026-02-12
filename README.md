@@ -41,6 +41,7 @@ This project has been migrated from Vite to **Next.js 16 (App Router)** and now 
    - `supabase/migrations/20260212120000_init_voting.sql`
    - `supabase/migrations/20260212145000_fix_cast_vote_vote_count_ambiguity.sql`
    - `supabase/migrations/20260212170000_add_admin_candidate_storage.sql`
+   - `supabase/migrations/20260212191000_tighten_vote_limits_and_messages.sql`
 3. Confirm tables/functions exist:
    - `public.candidates`
    - `public.votes`
@@ -66,9 +67,9 @@ Vote casting is server-side and enforced in SQL (`cast_vote`) using hashed ident
 
 Current protections:
 
-- 10-second cooldown between votes per device
-- Max 10 votes per device per 24 hours
-- Max 40 votes per IP per 24 hours
+- 3-second cooldown between votes per device
+- Max 2 votes per device per 24 hours
+- Max 20 votes per IP per 24 hours
 - No repeat vote for same candidate from same device within 24 hours
 
 Note: browser apps cannot reliably read a real MAC address. Device + IP + server-side rate limits are used instead.

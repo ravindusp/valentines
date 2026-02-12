@@ -86,11 +86,23 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(
     {
       ok: isOk,
+      status: result.status,
       message: result.message,
       votes: result.vote_count,
       hasVoted: isOk || result.status === 'already_voted',
       hasVotedAt: result.voted_at || new Date().toISOString(),
     },
-    { status: isOk ? 200 : result.status === 'already_voted' || result.status === 'rate_limited' ? 429 : 400 }
+    {
+      status:
+        isOk
+          ? 200
+          : result.status === 'already_voted' ||
+              result.status === 'rate_limited' ||
+              result.status === 'cooldown_limited' ||
+              result.status === 'device_limited' ||
+              result.status === 'ip_limited'
+            ? 429
+            : 400,
+    }
   );
 }

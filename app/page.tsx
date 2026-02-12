@@ -15,8 +15,8 @@ export default function HomePage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const items = await fetchCandidates(4);
-        setCandidates(items);
+        const payload = await fetchCandidates(4);
+        setCandidates(payload.candidates);
       } catch (error) {
         setErrorMessage(error instanceof Error ? error.message : 'Failed to load candidates.');
       }

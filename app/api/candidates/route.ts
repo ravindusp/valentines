@@ -4,6 +4,8 @@ import { mapCandidateRow } from '@/lib/candidate-mapper';
 import { createStableHash, getVoteSalt } from '@/lib/security';
 import { hasSupabaseAdmin, supabaseAdmin } from '@/lib/supabase/admin';
 
+const DEVICE_DAILY_LIMIT = 2;
+
 export async function GET(request: NextRequest) {
   const limitParam = request.nextUrl.searchParams.get('limit');
   const parsedLimit = limitParam ? Number(limitParam) : undefined;
@@ -39,6 +41,7 @@ export async function GET(request: NextRequest) {
   }
 
   const votedCandidateMap = new Map<string, string>();
+  let deviceVotesUsed = 0;
 
   if (deviceHash) {
     const { data: recentVotes, error: votesError } = await supabaseAdmin
@@ -49,6 +52,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (!votesError && recentVotes) {
+      deviceVotesUsed = recentVotes.length;
       for (const vote of recentVotes) {
         if (!votedCandidateMap.has(vote.candidate_id)) {
           votedCandidateMap.set(vote.candidate_id, vote.created_at);
@@ -59,5 +63,10 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     candidates: (candidates || []).map((row) => mapCandidateRow(row, votedCandidateMap)),
+    votingPower: {
+      dailyLimit: DEVICE_DAILY_LIMIT,
+      used: deviceVotesUsed,
+      remaining: Math.max(0, DEVICE_DAILY_LIMIT - deviceVotesUsed),
+    },
   });
 }
