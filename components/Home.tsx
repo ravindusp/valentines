@@ -54,9 +54,13 @@ const Home: React.FC<HomeProps> = ({ onNavigateToGallery, onNavigateToProfile, c
               <span className="material-icons text-sm">auto_awesome</span>
               2026 CROWNING EVENT
             </span>
-            <h1 className="font-serif text-6xl lg:text-8xl leading-tight mb-8">
-              Who will be <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-pink-400">the Queen?</span>
+            <h1 className="font-serif text-5xl sm:text-6xl lg:text-8xl mb-8 overflow-visible">
+              <span className="block font-semibold text-slate-900 leading-[1.08]">Who will be</span>
+              <span className="block pb-3 leading-[1.2]">
+                <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary to-pink-400">
+                  the Queen?
+                </span>
+              </span>
             </h1>
             <p className="text-xl text-slate-600 max-w-lg mb-10 leading-relaxed">
               Cast your vote and help us crown this year's Valentine's Queen. Celebrate beauty, grace, and community spirit.
